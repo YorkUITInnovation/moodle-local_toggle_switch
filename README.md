@@ -169,4 +169,4 @@ This plugin is licensed under the GNU GPL v3 or later, the same license as Moodl
 **Version**: 1.0  
 **Moodle Version**: 4.0+  
 **Plugin Type**: Local  
-**Maturity**: Alpha
+**Maturity**: Stable
