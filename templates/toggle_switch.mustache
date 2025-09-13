@@ -1,0 +1,164 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_toggle_switch/toggle_switch
+
+    Toggle switch template.
+
+    Context variables required for this template:
+    * elementid - The ID for the checkbox element
+    * disabled - Whether the field is disabled
+    * value - The value (0 = unchecked/off, 1 = checked/on)
+    * tooltip - Optional tooltip text to show on mouseover
+
+    Example context (json):
+    {
+        "elementid": "accept",
+        "disabled": false,
+        "value": 1,
+        "tooltip": "Click to toggle this setting"
+    }
+}}
+
+<style>
+/* The switch - the box around the slider */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+/* The slider */
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    -webkit-transition: .4s;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+.toggle-switch input:checked + .toggle-slider {
+    background-color: #2196F3;
+}
+
+.toggle-switch input:focus + .toggle-slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+.toggle-switch input:checked + .toggle-slider:before {
+    -webkit-transform: translateX(26px);
+    -ms-transform: translateX(26px);
+    transform: translateX(26px);
+}
+
+.toggle-switch input:disabled + .toggle-slider {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.toggle-switch input:disabled + .toggle-slider:before {
+    cursor: not-allowed;
+}
+
+/* Make the label clickable for better accessibility */
+.toggle-switch {
+    user-select: none;
+}
+
+.toggle-switch input:not(:disabled) + .toggle-slider:hover {
+    background-color: #bbb;
+}
+
+.toggle-switch input:not(:disabled):checked + .toggle-slider:hover {
+    background-color: #1976D2;
+}
+</style>
+
+<label class="toggle-switch">
+    <input type="checkbox"
+           id="toggle_{{elementid}}"
+           name="temp_{{elementid}}"
+           value="1"
+           {{#value}}checked{{/value}}
+           {{#disabled}}disabled{{/disabled}}>
+    <span class="toggle-slider"{{#tooltip}} title="{{tooltip}}"{{/tooltip}}></span>
+</label>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('toggle_{{elementid}}');
+    // Look for Moodle's hidden field which will have no ID, just name
+    const moodleHiddenField = document.querySelector('input[type="hidden"][name="{{elementid}}"]');
+
+    if (checkbox && moodleHiddenField) {
+        // Set initial value based on checkbox state
+        moodleHiddenField.value = checkbox.checked ? '1' : '0';
+
+        // Update Moodle's hidden field when checkbox changes
+        checkbox.addEventListener('change', function() {
+            moodleHiddenField.value = this.checked ? '1' : '0';
+            console.log('Toggle changed - Checkbox checked:', this.checked, 'Moodle hidden field value:', moodleHiddenField.value);
+        });
+
+        // Ensure correct value on form submission
+        const form = checkbox.closest('form');
+        if (form) {
+            form.addEventListener('submit', function() {
+                moodleHiddenField.value = checkbox.checked ? '1' : '0';
+                console.log('Form submitting - Final Moodle hidden field value:', moodleHiddenField.value);
+            });
+        }
+
+        console.log('Toggle switch initialized - Checkbox:', checkbox.checked, 'Moodle hidden field:', moodleHiddenField.value);
+    } else {
+        console.log('Toggle switch elements not found - Checkbox:', !!checkbox, 'Moodle hidden field:', !!moodleHiddenField);
+        console.log('Looking for checkbox ID: toggle_{{elementid}}');
+        console.log('Looking for Moodle hidden field: input[type="hidden"][name="{{elementid}}"]');
+
+        // Debug: show all hidden fields
+        const allHidden = document.querySelectorAll('input[type="hidden"]');
+        console.log('All hidden fields found:', Array.from(allHidden).map(f => f.name));
+    }
+});
+</script>
